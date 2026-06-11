@@ -1,10 +1,14 @@
 
+Required soft to test on pc
+
+```bash
 sudo apt install nodejs npm
-
-git clone ...
-cd dir
-
+```
+```bash
+git clone https://github.com/delux444/pscf-web.git
+cd pscf-web
 npx serve .
+```
 
 podglądanie zwracanej wartości w terminalu przez 
 
