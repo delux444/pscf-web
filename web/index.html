@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protocol Configurator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="wrapper">
+
+    <p class="page-label">Protocol Configuration Panel</p>
+
+    <!-- ------------------- MODBUS TCP ------------------- -->
+    <div class="panel open" id="modbus-panel">
+      <div class="flash-overlay" id="modbus-flash"></div>
+      <div class="panel-header" onclick="togglePanel('modbus-panel')">
+        <div class="header-left">
+          <span class="dot" id="modbus-dot"></span>
+          <span class="proto-name">Modbus TCP</span>
+          <span class="badge" id="modbus-badge">idle</span>
+        </div>
+        <span class="chevron">❯</span>
+      </div>
+      <div class="panel-body">
+        <div class="grid">
+          <div class="form-group">
+            <label>IP address</label>
+            <input type="text" id="mb-ip" value="localhost" placeholder="localhost">
+          </div>
+          <div class="form-group">
+            <label>Port</label>
+            <input type="number" id="mb-port" value="3333">
+          </div>
+          <div class="form-group">
+            <label>Unit ID</label>
+            <input type="number" id="mb-unit" value="1">
+          </div>
+          <div class="form-group">
+            <label>Function code</label>
+            <select id="mb-fc">
+              <option value="01">FC01 – Read Coils</option>
+              <option value="02">FC02 – Read Discrete Inputs</option>
+              <option value="03" selected>FC03 – Read Holding Registers</option>
+              <option value="04">FC04 – Read Input Registers</option>
+              <option value="05">FC05 – Write Single Coil</option>
+              <option value="06">FC06 – Write Single Register</option>
+              <option value="15">FC15 – Write Multiple Coils</option>
+              <option value="16">FC16 – Write Multiple Registers</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Start address</label>
+            <input type="number" id="mb-addr" value="0">
+          </div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="mb-qty" value="1">
+          </div>
+          <div class="form-group">
+            <label>Data type</label>
+            <select id="mb-dtype">
+              <option value="boolean">Boolean</option>
+              <option value="int16">Int16</option>
+              <option value="uint16">UInt16</option>
+              <option value="int32">Int32</option>
+              <option value="uint32">UInt32</option>
+              <option value="float" selected>Float / Real</option>
+              <option value="string">String (ASCII)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Value to write</label>
+            <input type="text" id="mb-val" placeholder="e.g. 42 or true">
+          </div>
+          <div class="separator"></div>
+          <div class="form-group">
+            <label>Send mode</label>
+            <select id="mb-mode">
+              <option value="single">Single shot</option>
+              <option value="loop">Cyclic loop</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Interval (ms)</label>
+            <input type="number" id="mb-interval" value="1000" min="100">
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="mb-send-btn" onclick="modbusAction()">&#9658; Send</button>
+            <button class="btn btn-stop" id="mb-stop-btn" onclick="modbusStop()" style="display:none">&#9632; Stop loop</button>
+            <div class="loop-indicator" id="mb-loop-ind">
+              <span class="dot active pulse"></span>
+              Loop running &middot; <span class="counter" id="mb-count">0</span> sent
+            </div>
+          </div>
+          <div class="status-area">
+            <div class="progress-wrap" id="mb-prog-wrap">
+              <div class="progress-bar" id="mb-prog"></div>
+            </div>
+          </div>
+          <div class="log-box" id="mb-log"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------- PROTOCOL X ------------------- -->
+    <div class="panel" id="protox-panel">
+      <div class="flash-overlay" id="protox-flash"></div>
+      <div class="panel-header" onclick="togglePanel('protox-panel')">
+        <div class="header-left">
+          <span class="dot" id="protox-dot"></span>
+          <span class="proto-name">Protocol X</span>
+          <span class="badge" id="protox-badge">idle</span>
+        </div>
+        <span class="chevron">❯</span>
+      </div>
+      <div class="panel-body">
+        <div class="grid">
+          <div class="form-group">
+            <label>Endpoint</label>
+            <input type="text" id="px-endpoint" placeholder="device-id or address">
+          </div>
+          <div class="form-group">
+            <label>Command</label>
+            <input type="text" id="px-cmd" placeholder="e.g. READ_STATUS">
+          </div>
+          <div class="form-group">
+            <label>Payload</label>
+            <input type="text" id="px-payload" placeholder="optional">
+          </div>
+          <div class="form-group">
+            <label>Send mode</label>
+            <select id="px-mode">
+              <option value="single">Single shot</option>
+              <option value="loop">Cyclic loop</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Interval (ms)</label>
+            <input type="number" id="px-interval" value="2000" min="100">
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="px-send-btn" onclick="protoxAction()">&#9658; Send</button>
+            <button class="btn btn-stop" id="px-stop-btn" onclick="protoxStop()" style="display:none">&#9632; Stop loop</button>
+            <div class="loop-indicator" id="px-loop-ind">
+              <span class="dot active pulse"></span>
+              Loop running &middot; <span class="counter" id="px-count">0</span> sent
+            </div>
+          </div>
+          <div class="status-area">
+            <div class="progress-wrap" id="px-prog-wrap">
+              <div class="progress-bar" id="px-prog"></div>
+            </div>
+          </div>
+          <div class="log-box" id="px-log"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>
